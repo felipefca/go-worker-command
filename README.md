@@ -7,7 +7,7 @@ Worker que lê mensagens de filas diferentes e processa fazendo requisições ex
 <!-- SOBRE O PROJETO -->
 ## Sobre o Projeto
 
-Aplicação que lê mensagens em parapelo de duas filas com DQL e routingkeys diferentes utilizando canais e goroutines. Faz o processamento das mensagens chamando APIs externas para consulta de dados 
+Aplicação que lê mensagens em parapelo de duas filas com DQL e routingkeys diferentes utilizando canais e goroutines. Faz o processamento das mensagens chamando APIs externas em paralelo utilizando WaitGroup e goroutines 
 
 ### Utilizando
 
