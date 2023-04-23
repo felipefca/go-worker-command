@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      RABBITMQ_HOST: localhost:5672/
+      RABBITMQ_STOCK_QUEUE: stock-command-queue
+      RABBITMQ_FIAT_QUEUE: fiat-command-queue
+      RABBITMQ_EXCHANGE: command-exchange
+      RABBITMQ_DLQ_EXCHANGE: command-exchange-dlq
+      RABBITMQ_DLQ_QUEUE: command-queue-dlq
+      RABBITMQ_TTL: 5000
+      RABBITMQ_FIAT_ROUTING_KEY: fiat-routing
+      RABBITMQ_STOCK_ROUTING_KEY: stock-routing
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
