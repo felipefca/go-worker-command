@@ -42,6 +42,11 @@ Executar o comando para inicializar o MongoDB, RabbitMQ e a aplicação na porta
    go run main.go
    ```
 
+<!-- AGRADECIMENTOS -->
+## Agradecimentos
+
+* [Finnhub](https://finnhub.io/)
+* [AwesomeApis](https://docs.awesomeapi.com.br/api-de-moedas)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
