@@ -9,10 +9,12 @@ Worker que lê mensagens de filas diferentes e processa fazendo requisições ex
 
 Aplicação que lê mensagens em parapelo de duas filas com DQL e routingkeys diferentes utilizando canais e goroutines. Faz o processamento das mensagens chamando APIs externas em paralelo utilizando WaitGroup e goroutines 
 
+![img](https://user-images.githubusercontent.com/21323326/233877399-487d793c-76b4-445b-88fd-111c94145c26.png)
+
+
 ### Utilizando
 
 * [![Go][Go-badge]][Go-url]
-* [![MongoDB][MongoDB-badge]][MongoDB-url]
 * [![RabbitMQ][RabbitMQ-badge]][RabbitMQ-url]
 * [![Docker][Docker-badge]][Docker-url]
 * [![VS Code][VSCode-badge]][VSCode-url]
