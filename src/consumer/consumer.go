@@ -141,7 +141,7 @@ func ConsumerConnect() {
 	stockMsgs, err := ch.Consume(
 		stockQueue.Name, // nome da fila
 		"worker",        // consumer tag
-		true,            // auto-ack
+		false,           // auto-ack
 		false,           // exclusividade
 		false,           // sem argumentos extras
 		false,           // sem pre-fetch
@@ -154,7 +154,7 @@ func ConsumerConnect() {
 	fiatMsgs, err := ch.Consume(
 		fiatQueue.Name, // nome da fila
 		"worker2",      // consumer tag
-		true,           // auto-ack
+		false,          // auto-ack
 		false,          // exclusividade
 		false,          // sem argumentos extras
 		false,          // sem pre-fetch
@@ -170,18 +170,34 @@ func ConsumerConnect() {
 	go func() {
 		// loop para consumir mensagens da fila 1
 		for d := range stockMsgs {
-			fmt.Printf("Mensagem recebida: %s\n", d.Body)
-			service.ProcessStockService(ConsumeStockMessage(d))
-			fmt.Printf("Mensagem processada: %s\n", d.Body)
+			fmt.Printf("Mensagem recebida")
+
+			message, err := ConsumeStockMessage(d)
+			if err != nil {
+				RejectMessage(d)
+				continue
+			}
+
+			service.ProcessStockService(message)
+
+			AckMessage(d)
 		}
 	}()
 
 	go func() {
 		// loop para consumir mensagens da fila 2
 		for d := range fiatMsgs {
-			fmt.Printf("Mensagem da fila 2 recebida: %s\n", d.Body)
-			service.ProcessFiatService(ConsumeFiatMessage(d))
-			fmt.Printf("Mensagem da fila 2 processada: %s\n", d.Body)
+			fmt.Printf("Mensagem recebida")
+
+			message, err := ConsumeFiatMessage(d)
+			if err != nil {
+				RejectMessage(d)
+				continue
+			}
+
+			service.ProcessFiatService(message)
+
+			AckMessage(d)
 		}
 	}()
 
@@ -189,24 +205,42 @@ func ConsumerConnect() {
 	<-forever
 }
 
-func ConsumeFiatMessage(d amqp.Delivery) models.Fiat {
+func ConsumeFiatMessage(d amqp.Delivery) (models.Fiat, error) {
 	var fiat models.Fiat
 
 	err := json.Unmarshal(d.Body, &fiat)
 	if err != nil {
-		log.Fatalf("Erro ao deserializar JSON: %v", err)
+		fmt.Printf("Erro ao deserializar JSON: %v", err)
+		return models.Fiat{}, err
 	}
 
-	return fiat
+	return fiat, nil
 }
 
-func ConsumeStockMessage(d amqp.Delivery) models.Stock {
+func ConsumeStockMessage(d amqp.Delivery) (models.Stock, error) {
 	var stock models.Stock
 
 	err := json.Unmarshal(d.Body, &stock)
 	if err != nil {
-		log.Fatalf("Erro ao deserializar JSON: %v", err)
+		fmt.Printf("Erro ao deserializar JSON: %v", err)
+		return models.Stock{}, err
 	}
 
-	return stock
+	return stock, nil
+}
+
+func RejectMessage(msg amqp.Delivery) {
+	if err := msg.Nack(false, false); err != nil {
+		log.Printf("Erro ao enviar mensagem para DLQ: %v", err)
+	} else {
+		log.Printf("Mensagem enviada para DLQ")
+	}
+}
+
+func AckMessage(msg amqp.Delivery) {
+	if err := msg.Ack(false); err != nil {
+		log.Printf("Erro ao confirmar o recebimento da mensagem: %v", err)
+	} else {
+		log.Printf("Mensagem processada com sucesso")
+	}
 }
